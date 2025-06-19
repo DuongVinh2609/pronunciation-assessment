@@ -1,110 +1,104 @@
-# Pronunciation Assessment Model
+# Enhanced Pronunciation Assessment with Wav2Vec2 and BERT
 
-This repository contains a Google Colab-based implementation of an **automatic pronunciation assessment** system using Microsoft's **Azure Speech Services**. The model provides multi-level feedback on spoken language input by evaluating various dimensions of pronunciation quality.
+This repository implements a **multi-level automatic pronunciation assessment system** using deep learning. The system leverages **Wav2Vec2** for speech representation and **BERT** for text encoding, enabling fine-grained scoring of utterances and words across multiple pronunciation dimensions.
 
 ## 🎯 Objective
 
-The primary objective of this project is to evaluate the **pronunciation proficiency** of a speaker by comparing their spoken input to a reference text. The system returns detailed feedback across several linguistic dimensions and hierarchical levels, including:
-
-- **Overall accuracy**
-- **Completeness**
+To develop a robust and interpretable model that evaluates non-native speech based on:
+- **Accuracy**
 - **Fluency**
-- **Phoneme-level and word-level correctness**
-- **(Optional) Prosody metrics** such as rhythm, intonation, and stress
+- **Completeness**
+- **Prosody**
+- **Overall pronunciation quality**
+
+The model further predicts **word-level pronunciation scores** and identifies potential mispronunciations at the phoneme level.
 
 ## 🧠 Key Features
 
-- **Azure Integration**: Interfaces with Azure's Speech SDK to process spoken input and retrieve rich assessment results.
-- **Multi-level Scoring**: Returns evaluation at the utterance, word, syllable, and phoneme levels.
-- **Configurable Modes**: Supports both *scripted* and *unscripted* pronunciation assessment tasks.
-- **Real-time Analysis**: Capable of working with audio from microphone input or pre-recorded files.
-- **Output Format**: Outputs detailed JSON structures including scores and phonetic error analysis.
+- **Wav2Vec2-based Acoustic Embedding**: Extracts contextual speech features from raw waveforms.
+- **BERT-based Text Embedding**: Encodes reference transcripts for semantic alignment.
+- **MFCC and Prosodic Features**: Combines handcrafted prosody (e.g., pitch, ZCR, pause ratio) with learned representations.
+- **Phoneme-Level Analysis**: Segments utterances and evaluates timing and distortion per phoneme.
+- **Transformer Encoder Architecture**: Models interdependencies among phoneme, word, and utterance representations.
+- **Multi-task Learning**: Simultaneously predicts utterance-level and word-level scores.
+- **Cross-modal Attention (optional)**: Aligns speech and text features in a shared latent space.
 
-## ⚙️ Technologies Used
+## 🗃️ Dataset & Preprocessing
 
-- Programming Language: **Python**
-- Runtime Environment: **Google Colab**
-- Speech Engine: **Azure Cognitive Services - Speech SDK**
-- File Parsing and Processing: `nbformat`, `json`, `matplotlib` (for visualization)
+The model expects data in a **Kaldi-style format**:
+- `wav.scp`, `text`, `utt2spk`, `lexicon.txt`, and `text-phone` mappings
+- Audio at 16kHz, mono-channel, `.wav` format
 
-## 📝 Getting Started
+Data preprocessing includes:
+- Extracting **MFCCs**, **Wav2Vec2 embeddings**, **pitch contours**, and **phoneme durations**
+- Computing **distortion metrics** between expected and actual phones
+- Building structured feature tensors with masks
 
-### 1. Clone or open the notebook
+> Preprocessed data is saved in `.pt` format for efficient loading.
 
-You may open the notebook directly via [Google Colab](https://colab.research.google.com/) or clone this repository locally.
+## ⚙️ Architecture Overview
 
-### 2. Install dependencies
+- **Phone Encoder**: Projects (timing deviation, distortion) vectors into latent space.
+- **Word Reconstructor**: Aggregates phones into word-level embeddings.
+- **CLS Tokens**: Used to represent global utterance-level semantics.
+- **Transformer Encoder**: Encodes token sequences with positional encodings.
+- **Regression Heads**: Separate heads predict each pronunciation trait (accuracy, fluency, etc.).
 
-```python
-!pip install azure-cognitiveservices-speech nbformat
-```
+## 🚀 Training
 
-### 3. Set up Azure credentials
-
-Replace the placeholders with your actual Azure API credentials:
-
-```python
-speech_key = "YOUR_AZURE_SPEECH_KEY"
-service_region = "YOUR_SERVICE_REGION"
-```
-
-### 4. Configure the reference text and audio input
-
-Provide a target sentence for pronunciation and either:
-- Record audio via microphone
-- Upload an audio file in `.wav` format (mono, 16kHz recommended)
-
-### 5. Run the evaluation pipeline
-
-Execute the remaining cells to:
-- Send audio to Azure Speech API
-- Receive pronunciation feedback in structured JSON
-- Visualize scores (optional)
-
-### 6. Optional: Enable Prosody Scoring
+Run:
 
 ```python
-enable_prosody = True
+if __name__ == "__main__":
+    train_model(train_path, test_path, text_train_path, text_test_path, num_epochs=20)
 ```
 
-This enables feedback related to **intonation**, **stress patterns**, and **speech rhythm**.
+- Uses `AdamW` optimizer with cosine annealing scheduler
+- Supports early stopping and gradient clipping
+- Saves the best model based on validation loss
 
-## 📂 Project Structure
+## 📈 Evaluation
 
+Evaluation includes:
+- **Utterance-level metrics**: MAE, MSE, R², Pearson correlation
+- **Word-level metrics**: Regression + classification (correct vs incorrect)
+- **Confusion matrix** for binary correctness at word level
+
+Results are visualized with `seaborn` and `matplotlib`.
+
+## 🧪 Inference & Visualization
+
+Use:
+```python
+run_inference(checkpoint_path, test_path, text_test_path)
+display_inference_results(...)
+evaluate_and_visualize(...)
 ```
-.
-├── Pronunciation_assessment_model.ipynb    # Main notebook
-├── README.md                               # Project documentation
-└── [optional files: audio samples, helper scripts, configs]
+
+Provides:
+- Per-sample utterance scores
+- Word-level correctness breakdown
+- Comparative metrics between predicted and ground-truth scores
+
+## 📚 Dependencies
+
+- `torch`, `torchaudio`, `transformers`, `librosa`, `scikit-learn`
+- `fastdtw`, `scipy`, `matplotlib`, `seaborn`
+
+Install using:
+```bash
+pip install -r requirements.txt
 ```
 
-## 📊 Sample Evaluation Output
+## 📌 Notes
 
-Each evaluation returns:
+- This system is inspired by models like **GOPT** and **CALL** frameworks.
+- Suitable for **Computer-Assisted Pronunciation Training (CAPT)** and **language learning applications**.
 
-- **OverallScore**: Composite score based on pronunciation accuracy
-- **Word-level feedback**: Correctness, stress, timing
-- **Phoneme-level feedback**: Mispronunciation detection, substitution, omission
-- **(Optional) Prosody**: Evaluation of suprasegmental features
+## 📜 License
 
-## 🔬 Potential Applications
+MIT License.
 
-- Computer-Assisted Language Learning (CALL) systems
-- English pronunciation training for non-native speakers
-- Automated speaking assessments (e.g., TOEFL, IELTS practice tools)
-- Research on speech intelligibility and accent detection
+## ✍️ Author
 
-## 📚 References
-
-- Microsoft Azure Speech Services - [Pronunciation Assessment API](https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/how-to-pronunciation-assessment)
-- [Automatic Pronunciation Evaluation in CALL Systems](https://aclanthology.org/)
-- Suprasegmental analysis using speech prosody models in L2 evaluation
-
----
-
-> *For academic use, please cite or acknowledge the use of Azure’s Pronunciation Assessment API as the core speech engine.*
-
----
-
-**Author**: [Duong Vinh](https://github.com/DuongVinh2609)  
-**License**: MIT License (unless otherwise specified)
+[Duong Vinh](https://github.com/DuongVinh2609)
