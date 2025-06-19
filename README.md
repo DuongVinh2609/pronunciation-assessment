@@ -1,4 +1,4 @@
-# Enhanced Pronunciation Assessment with Wav2Vec2 and BERT
+# Pronunciation Assessment
 
 This repository implements a **multi-level automatic pronunciation assessment system** using deep learning. The system leverages **Wav2Vec2** for speech representation and **BERT** for text encoding, enabling fine-grained scoring of utterances and words across multiple pronunciation dimensions.
 
@@ -96,10 +96,6 @@ pip install -r requirements.txt
 
 - This system is inspired by models like **GOPT** and **CALL** frameworks.
 - Suitable for **Computer-Assisted Pronunciation Training (CAPT)** and **language learning applications**.
-
-## 📜 License
-
-MIT License.
 
 ## 📖 References
 
