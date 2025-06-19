@@ -25,6 +25,8 @@ The model further predicts **word-level pronunciation scores** and identifies po
 
 ## 🗃️ Dataset & Preprocessing
 
+This project uses the **[SpeechOcean762](https://www.speechocean.com/datacenter/details/142.html)** dataset — a large-scale corpus for non-native English pronunciation assessment. It includes audio from L2 English learners with diverse proficiency levels.
+
 The model expects data in a **Kaldi-style format**:
 - `wav.scp`, `text`, `utt2spk`, `lexicon.txt`, and `text-phone` mappings
 - Audio at 16kHz, mono-channel, `.wav` format
@@ -98,6 +100,14 @@ pip install -r requirements.txt
 ## 📜 License
 
 MIT License.
+
+## 📖 References
+
+- [SpeechOcean762 Dataset](https://www.speechocean.com/datacenter/details/142.html)
+- Microsoft Azure Speech Services - [Pronunciation Assessment API](https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/how-to-pronunciation-assessment)
+- [Automatic Pronunciation Evaluation in CALL Systems](https://aclanthology.org/)
+- [Wav2Vec2: Self-Supervised Learning of Speech Representations](https://arxiv.org/abs/2006.11477)
+- [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
 
 ## ✍️ Author
 
