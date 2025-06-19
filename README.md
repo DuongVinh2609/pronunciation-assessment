@@ -106,5 +106,7 @@ pip install -r requirements.txt
 - [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)
 
 ## ✍️ Author
+- Dương Nguyễn Gia Vinh
 
+Vietnam National University, Hanoi – University of Engineering and Technology
 [Duong Vinh](https://github.com/DuongVinh2609)
